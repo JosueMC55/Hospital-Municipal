@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Departamento de Archivos — Archivo Clínico Hospitalario</title>
+<meta name="description" content="Departamento de Archivos del hospital: función, expedientes de ejemplo, tipos de archivo clínico, normativas y consulta de registros ficticios de demostración.">
+<meta name="theme-color" content="#1F4B43">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231F4B43'/%3E%3Crect x='8' y='7' width='16' height='5' fill='%23C98A3D'/%3E%3Crect x='8' y='14' width='16' height='5' fill='%23EFE7D6'/%3E%3Crect x='8' y='21' width='16' height='5' fill='%23EFE7D6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   Departamento de Archivos — hoja de estilos
+   Mantiene la apariencia original y agrega:
+   buscador, consulta de registros, adaptación a móvil y accesibilidad.
+   ========================================================= */
+
+:root{
+  --paper:#EFE7D6;
+  --paper-2:#E4D9C2;
+  --card:#F7F1E4;
+  --ink:#1E1B16;
+  --pine:#1F4B43;
+  --pine-dark:#153833;
+  --rust:#7A5233;          /* original #8B5E3C: oscurecido para cumplir contraste AA sobre --paper-2 */
+  --amber:#C98A3D;
+  --amber-claro:#E3B067;   /* texto ámbar sobre fondos verdes oscuros (contraste AA) */
+  --line:#C9BBA0;
+  --stamp:#B24A3C;
+  --gutter:28px;
+  --f-texto:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --f-titulo:'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --f-mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+}
+
+*{box-sizing:border-box;}
+[hidden]{display:none !important;}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-texto);
+  line-height:1.6;
+  overflow-wrap:break-word;
+}
+h1,h2,h3{
+  font-family:var(--f-titulo);
+  font-weight:700;
+  margin:0;
+  color:var(--pine-dark);
+}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--paper-2);padding:1px 5px;border-radius:3px;}
+
+.wrap{max-width:920px;margin:0 auto;padding:0 var(--gutter) 80px;}
+.wrap:focus{outline:none;}
+
+.sr-only{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+:focus-visible{outline:3px solid var(--pine-dark);outline-offset:2px;}
+.saltar{position:absolute;left:-9999px;top:8px;z-index:10;background:var(--pine-dark);color:var(--paper);padding:10px 16px;border-radius:6px;}
+.saltar:focus{left:12px;}
+
+/* ---------- Botones y campos ---------- */
+.btn{
+  font:inherit;font-size:.95rem;font-weight:500;
+  min-height:46px;min-width:46px;padding:9px 18px;
+  border:1px solid var(--pine);border-radius:6px;
+  background:var(--card);color:var(--pine-dark);
+  cursor:pointer;
+}
+.btn:hover{background:var(--paper-2);}
+.btn-primario{background:var(--pine);color:var(--paper);}
+.btn-primario:hover{background:var(--pine-dark);}
+.btn-chico{min-height:44px;padding:6px 14px;font-size:.9rem;}
+
+input[type="search"], select{
+  font:inherit;font-size:1rem;color:var(--ink);
+  width:100%;min-height:46px;padding:9px 12px;
+  background:var(--card);border:1px solid var(--pine);border-radius:6px;
+}
+input[type="search"]::placeholder{color:#6B6254;opacity:1;}
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearance:none;}
+input::-webkit-calendar-picker-indicator{display:none !important;}
+
+.campo{position:relative;flex:1;min-width:0;}
+.campo input[type="search"]{padding-left:42px;padding-right:12px;}
+.campo input[type="search"]:not(:placeholder-shown){padding-right:46px;}
+.lupa{position:absolute;left:13px;top:50%;width:20px;height:20px;margin-top:-10px;color:var(--rust);pointer-events:none;}
+.borrar{
+  position:absolute;right:1px;top:1px;width:44px;height:44px;
+  border:0;background:none;color:var(--rust);
+  font-size:1.6rem;line-height:1;cursor:pointer;border-radius:6px;
+}
+.borrar:hover{color:var(--ink);}
+
+/* ---------- Buscador general ---------- */
+.buscador{max-width:920px;margin:0 auto;padding:18px var(--gutter) 0;}
+.buscador-form{display:flex;gap:8px;align-items:stretch;}
+.resultados{margin-top:12px;border:1px solid var(--pine);background:var(--card);}
+.resultados-cab{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:8px 12px 8px 14px;background:var(--paper-2);border-bottom:1px solid var(--line);
+}
+.resultados-estado{margin:0;font-size:.92rem;font-weight:500;color:var(--pine-dark);}
+.resultados-lista{list-style:none;margin:0;padding:0;}
+.resultados-lista li{border-bottom:1px solid var(--line);}
+.resultados-lista li:last-child{border-bottom:none;}
+.resultado{
+  display:block;width:100%;min-height:44px;padding:12px 14px;
+  text-align:left;font:inherit;color:var(--ink);
+  background:none;border:0;cursor:pointer;
+}
+.resultado:hover{background:var(--paper);}
+.res-seccion{display:block;font-family:var(--f-mono);font-size:.78rem;color:var(--rust);}
+.res-titulo{display:block;font-weight:600;color:var(--pine-dark);}
+.res-extracto{display:block;font-size:.9rem;margin-top:2px;}
+mark{background:#F1D9A5;color:var(--ink);padding:0 2px;border-radius:2px;}
+
+/* ---------- Pestañas ---------- */
+.tabbar{display:flex;flex-wrap:wrap;gap:6px;padding:20px var(--gutter) 0;max-width:920px;margin:0 auto;}
+.tab{
+  background:var(--paper-2);
+  border:1px solid var(--line);
+  border-bottom:none;
+  border-radius:8px 8px 0 0;
+  padding:10px 18px;
+  min-height:44px;
+  font:inherit;font-size:.92rem;
+  color:var(--rust);
+  cursor:pointer;user-select:none;
+}
+.tab:hover{background:var(--card);}
+.tab.active{background:var(--pine);color:var(--paper);border-color:var(--pine);}
+.tab.active:hover{background:var(--pine);}
+
+header.hero{
+  background:var(--pine);
+  color:var(--paper);
+  border-radius:0 10px 10px 10px;
+  padding:52px 48px;
+  max-width:920px;
+  margin:0 auto 46px;
+}
+header.hero .kicker{color:var(--amber-claro);font-size:1rem;margin-bottom:10px;}
+header.hero h1{color:var(--paper);font-size:2.6rem;line-height:1.15;max-width:14ch;}
+header.hero p{max-width:52ch;color:#DDE7E3;font-size:1.05rem;margin-top:16px;}
+
+/* ---------- Secciones ---------- */
+section{margin-bottom:56px;}
+section.hidden{display:none;}
+.section-head{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--pine);padding-bottom:10px;margin-bottom:26px;}
+.section-head .num{font-family:var(--f-mono);color:var(--rust);font-size:.95rem;}
+.section-head h2{font-size:1.7rem;}
+
+p.lead{font-size:1.05rem;max-width:66ch;}
+.nota{font-size:.9rem;color:var(--rust);max-width:66ch;margin:-4px 0 24px;}
+
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
+.card{background:var(--paper-2);border-left:4px solid var(--pine);padding:20px 22px;}
+.card h3{font-size:1.08rem;color:var(--pine-dark);margin-bottom:8px;}
+.card p{margin:0;font-size:.96rem;}
+
+.filecab{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);background:var(--paper-2);}
+.drawer{display:grid;grid-template-columns:220px 1fr;border-bottom:1px solid var(--line);padding:16px 20px;gap:16px;}
+.drawer:last-child{border-bottom:none;}
+.drawer .label{font-family:var(--f-mono);color:var(--rust);font-size:.9rem;align-self:start;padding-top:2px;}
+.drawer .desc{font-size:.97rem;}
+
+.norms{list-style:none;margin:0;padding:0;}
+.norms li{padding:18px 0;border-bottom:1px solid var(--line);}
+.norms li:first-child{padding-top:0;}
+.norms li:last-child{border-bottom:none;}
+.norms .norm-title{font-weight:600;color:var(--pine-dark);margin-bottom:4px;font-size:1.02rem;}
+.norms .norm-desc{font-size:.96rem;}
+
+.callout{background:var(--pine-dark);color:var(--paper);padding:24px 26px;margin-top:26px;font-size:.98rem;}
+.callout strong{color:var(--amber-claro);}
+
+footer{max-width:920px;margin:0 auto;padding:20px var(--gutter) 40px;color:var(--rust);font-size:.86rem;border-top:1px solid var(--line);}
+
+/* ---------- Documentos de ejemplo ---------- */
+.doc-grid{display:flex;flex-direction:column;gap:32px;}
+.doc{background:var(--card);border:1px solid var(--line);box-shadow:3px 3px 0 var(--line);padding:0;}
+.doc-etiqueta{background:transparent;box-shadow:none;border:none;}
+.doc-etiqueta .doc-body{padding:0;}
+.doc-label{background:var(--pine-dark);color:var(--paper);font-family:var(--f-mono);font-size:.82rem;padding:8px 18px;}
+.doc-body{padding:26px 28px;}
+.doc-title{font-family:var(--f-titulo);font-weight:700;font-size:1.25rem;color:var(--pine-dark);margin-bottom:4px;}
+.doc-sub{font-size:.86rem;color:var(--rust);margin-bottom:18px;}
+
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;}
+.field{border-bottom:1px dashed var(--line);padding-bottom:8px;}
+.field .fl{font-size:.76rem;color:var(--rust);font-family:var(--f-mono);text-transform:lowercase;}
+.field .fv{font-size:.98rem;margin-top:2px;}
+
+table.index-table{width:100%;border-collapse:collapse;font-size:.92rem;}
+table.index-table th{
+  text-align:left;font-family:var(--f-mono);font-weight:500;
+  font-size:.78rem;color:var(--rust);padding:8px 10px;border-bottom:2px solid var(--pine);
+}
+table.index-table td{padding:10px 10px;border-bottom:1px solid var(--line);}
+table.index-table tr:last-child td{border-bottom:none;}
+.estado{font-family:var(--f-mono);font-size:.78rem;padding:2px 8px;border-radius:3px;}
+.estado.activo{background:#DCE9E1;color:var(--pine-dark);}
+.estado.pasivo{background:#EAE0CC;color:var(--rust);}
+
+.consent-text{font-size:.96rem;}
+.consent-text p{margin:0 0 14px;}
+.sign-row{display:flex;justify-content:space-between;margin-top:28px;gap:24px;}
+.sign-line{flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:.78rem;color:var(--rust);font-family:var(--f-mono);}
+
+.stamp{
+  display:inline-block;
+  border:2px solid var(--stamp);
+  color:var(--stamp);
+  font-family:var(--f-mono);
+  font-size:.78rem;
+  padding:4px 10px;
+  transform:rotate(-4deg);
+  margin-top:16px;
+}
+
+.folder-tab{display:flex;align-items:stretch;max-width:340px;}
+.folder-tab .tabpart{
+  background:var(--amber);color:var(--ink);
+  font-family:var(--f-mono);font-size:.78rem;
+  padding:6px 14px;border-radius:6px 6px 0 0;align-self:flex-end;
+}
+.folder-body{
+  background:var(--paper-2);border:1px solid var(--line);border-top:4px solid var(--amber);
+  padding:18px 20px;max-width:340px;margin-top:-1px;
+}
+.folder-body .fnum{font-family:var(--f-mono);color:var(--rust);font-size:.85rem;}
+.folder-body .fname{font-family:var(--f-titulo);font-weight:700;font-size:1.15rem;margin:6px 0 10px;color:var(--pine-dark);}
+.folder-body .frow{font-size:.86rem;display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted var(--line);}
+.folder-body .frow:last-child{border-bottom:none;}
+
+/* ---------- Consulta de registros ---------- */
+.aviso-demo{
+  background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--stamp);
+  padding:14px 18px 6px;margin-bottom:22px;font-size:.92rem;
+}
+.aviso-demo .stamp{margin:0 0 10px;transform:none;}
+.aviso-demo p{margin:0 0 10px;}
+
+.filtros{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;align-items:end;margin-bottom:14px;}
+.filtro-nombre, .filtro-limpiar{grid-column:1 / -1;}
+.filtro label{display:block;font-family:var(--f-mono);font-size:.8rem;color:var(--rust);margin-bottom:4px;}
+.fila-busqueda{display:flex;gap:8px;align-items:stretch;}
+.filtro-limpiar .btn{width:auto;}
+
+.estado-lista{margin:0 0 12px;font-size:.92rem;color:var(--pine-dark);font-weight:500;scroll-margin-top:12px;}
+
+.tabla-registros td:first-child{font-weight:600;color:var(--pine-dark);}
+
+.sin-resultados{
+  border:2px dashed var(--line);background:var(--paper);
+  padding:22px 22px 20px;
+}
+.sin-resultados p{margin:0 0 10px;}
+.sin-resultados .sin-titulo{font-family:var(--f-titulo);font-weight:700;font-size:1.1rem;color:var(--pine-dark);}
+.sin-resultados .btn{margin-top:6px;}
+
+.encontrado{
+  outline:3px solid var(--amber);outline-offset:3px;
+  background-color:rgba(201,138,61,.16);
+}
+.tabla-registros tr.encontrado{outline-offset:-3px;}
+
+/* ---------- Adaptación a pantallas pequeñas ---------- */
+@media(max-width:720px){
+  :root{--gutter:16px;}
+
+  .tabbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:16px;}
+  .tab{border-bottom:1px solid var(--line);border-radius:8px;text-align:center;padding:10px 8px;}
+  .tab.active{border-color:var(--pine);}
+
+  header.hero{border-radius:10px;padding:30px 20px;margin-top:12px;margin-bottom:32px;}
+  header.hero h1{font-size:clamp(1.65rem, 6.4vw, 2.2rem);max-width:none;}
+  header.hero p{font-size:1rem;margin-bottom:0;}
+
+  .section-head h2{font-size:1.4rem;}
+  .doc-body{padding:20px 16px;}
+  .doc-label{padding:8px 14px;}
+  .callout{padding:20px 18px;}
+
+  /* Tablas: cada fila pasa a ser una tarjeta (sin desplazamiento horizontal) */
+  table.tabla-resp, table.tabla-resp tbody, table.tabla-resp tr, table.tabla-resp td{display:block;width:100%;}
+  table.tabla-resp thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+  table.tabla-resp tr{
+    background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--pine);
+    padding:6px 14px;margin-bottom:10px;
+  }
+  table.tabla-resp tr:last-child{margin-bottom:0;}
+  table.index-table.tabla-resp tr td{
+    display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+    padding:7px 0;text-align:right;border-bottom:1px dotted var(--line);
+  }
+  table.index-table.tabla-resp tr td:last-child{border-bottom:none;}
+  table.tabla-resp td::before{
+    content:attr(data-label);flex:0 0 auto;max-width:45%;text-align:left;
+    font-family:var(--f-mono);font-size:.78rem;color:var(--rust);
+  }
+  /* Registros: tarjeta compacta (nombre arriba; edad, sexo, fecha y área en dos columnas) */
+  table.tabla-registros tr{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;padding:10px 14px;}
+  table.index-table.tabla-registros tr td{display:block;text-align:left;border-bottom:none;padding:2px 0;}
+  table.tabla-registros td::before{display:block;max-width:none;}
+  table.index-table.tabla-registros tr td:first-child{
+    grid-column:1 / -1;font-size:1.05rem;
+    border-bottom:1px dotted var(--line);padding-bottom:6px;margin-bottom:2px;
+  }
+  table.tabla-registros td:first-child::before{display:none;}
+}
+
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr;}
+  .drawer{grid-template-columns:1fr;gap:4px;}
+  .field-grid{grid-template-columns:1fr;}
+  .sign-row{gap:14px;}
+}
+
+@media(max-width:520px){
+  .filtros{grid-template-columns:1fr;}
+  .filtro-limpiar .btn{width:100%;}
+  .buscador-form .btn{padding-left:14px;padding-right:14px;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{scroll-behavior:auto !important;}
+}
+
+/* Vista alojada: respeta las barras del sistema en el móvil */
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+
+</style>
+<noscript><style>section.hidden{display:block;}</style></noscript>
+</head>
+<body>
+
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<!-- Buscador general de la página -->
+<div class="buscador" role="search">
+  <form class="buscador-form" id="form-global" novalidate>
+    <label class="sr-only" for="q-global">Buscar en la página</label>
+    <div class="campo">
+      <svg class="lupa" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5 21 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="q-global" type="search" autocomplete="off" enterkeyhint="search" placeholder="Buscar en la página">
+      <button type="button" class="borrar" id="q-global-borrar" aria-label="Borrar búsqueda" hidden>×</button>
+    </div>
+    <button type="submit" class="btn btn-primario">Buscar</button>
+  </form>
+
+  <div class="resultados" id="resultados" hidden>
+    <div class="resultados-cab">
+      <p class="resultados-estado" id="resultados-estado" role="status" aria-live="polite"></p>
+      <button type="button" class="btn btn-chico" id="resultados-cerrar">Cerrar</button>
+    </div>
+    <ul class="resultados-lista" id="resultados-lista"></ul>
+  </div>
+</div>
+
+<div class="tabbar" role="tablist" aria-label="Secciones de la página">
+  <button type="button" class="tab active" role="tab" id="tab-funcion" aria-controls="funcion" aria-selected="true"
+    data-target="funcion"
+    data-kicker="Departamento de Archivos"
+    data-title="El archivo clínico: memoria y custodia del hospital"
+    data-text="Todo lo que ocurre con un paciente queda escrito en algún expediente. Este departamento existe para que esa historia nunca se pierda, se pueda encontrar a tiempo y se mantenga en secreto frente a quien no debe verla.">Función</button>
+  <button type="button" class="tab" role="tab" id="tab-ejemplos" aria-controls="ejemplos" aria-selected="false" tabindex="-1"
+    data-target="ejemplos"
+    data-kicker="Expedientes"
+    data-title="Así se ve un expediente por dentro"
+    data-text="Historias clínicas, índices, consentimientos y etiquetas de carpeta: los documentos que el departamento crea y guarda todos los días.">Expedientes</button>
+  <button type="button" class="tab" role="tab" id="tab-tipos" aria-controls="tipos" aria-selected="false" tabindex="-1"
+    data-target="tipos"
+    data-kicker="Contenido del expediente"
+    data-title="Un expediente, muchos documentos"
+    data-text="Cada área del hospital aporta su propio tipo de registro al mismo expediente: notas, laboratorios, imágenes, altas y más.">Tipos de archivo</button>
+  <button type="button" class="tab" role="tab" id="tab-normativas" aria-controls="normativas" aria-selected="false" tabindex="-1"
+    data-target="normativas"
+    data-kicker="Marco legal"
+    data-title="Guardar un expediente es una obligación legal"
+    data-text="Leyes y normas que definen cuánto tiempo conservar un expediente, quién puede verlo y qué pasa si esa confidencialidad se rompe.">Normativas</button>
+</div>
+
+<div class="wrap" id="contenido" tabindex="-1">
+
+<header class="hero">
+  <div class="kicker" id="hero-kicker">Departamento de Archivos</div>
+  <h1 id="hero-title">El archivo clínico: memoria y custodia del hospital</h1>
+  <p id="hero-text">Todo lo que ocurre con un paciente queda escrito en algún expediente. Este departamento existe para que esa historia nunca se pierda, se pueda encontrar a tiempo y se mantenga en secreto frente a quien no debe verla.</p>
+</header>
+
+<section id="funcion" role="tabpanel" aria-labelledby="tab-funcion">
+  <div class="section-head">
+    <span class="num">01</span>
+    <h2>Función del departamento</h2>
+  </div>
+  <p class="lead">El Departamento de Archivos administra el ciclo de vida completo del expediente: desde que se abre en la primera consulta hasta que se conserva, se presta o se depura años después.</p>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Custodia y conservación</h3>
+      <p>Guarda cada expediente, físico o digital, protegido contra pérdida, deterioro o acceso indebido.</p>
+    </div>
+    <div class="card">
+      <h3>Organización y clasificación</h3>
+      <p>Ordena los expedientes por número de historia clínica, nombre o código.</p>
+    </div>
+    <div class="card">
+      <h3>Préstamo y devolución</h3>
+      <p>Controla qué médico o departamento retiró un expediente, cuándo y para qué.</p>
+    </div>
+    <div class="card">
+      <h3>Apertura de expedientes</h3>
+      <p>Crea la historia clínica de cada paciente nuevo con un número único.</p>
+    </div>
+    <div class="card">
+      <h3>Digitalización</h3>
+      <p>Convierte documentos en papel a formato digital para agilizar la consulta.</p>
+    </div>
+    <div class="card">
+      <h3>Confidencialidad</h3>
+      <p>Garantiza que solo personal autorizado consulte los datos del paciente.</p>
+    </div>
+  </div>
+</section>
+
+<section id="ejemplos" class="hidden" role="tabpanel" aria-labelledby="tab-ejemplos">
+  <div class="section-head">
+    <span class="num">02</span>
+    <h2>Archivos del departamento</h2>
+  </div>
+  <p class="lead">Así se ven, en la práctica, los documentos que este departamento crea y custodia.</p>
+  <p class="nota nota-ficticia">Todos los nombres y datos de esta sección son ejemplos ficticios. No corresponden a personas ni a pacientes reales.</p>
+
+  <div class="doc-grid">
+
+    <!-- Consulta de registros (datos ficticios de demostración) -->
+    <div class="doc" id="consulta-registros">
+      <div class="doc-label">CONSULTA DE REGISTROS · DATOS FICTICIOS DE DEMOSTRACIÓN</div>
+      <div class="doc-body">
+        <div class="doc-title">Consulta de registros</div>
+        <div class="doc-sub">Escribe un nombre y la lista se filtra mientras escribes</div>
+
+        <div class="aviso-demo" role="note">
+          <span class="stamp">datos ficticios</span>
+          <p><strong>Estas diez personas no existen.</strong> Son datos inventados para mostrar cómo funciona la consulta. No son pacientes reales.</p>
+          <p>Lo que escribes no se guarda ni se envía a ningún servidor. Los registros están dentro de la página y, al recargarla, todo vuelve al estado inicial.</p>
+        </div>
+
+        <div class="filtros">
+          <div class="filtro filtro-nombre">
+            <label for="f-nombre">Buscar por nombre</label>
+            <div class="fila-busqueda">
+              <div class="campo">
+                <svg class="lupa" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5 21 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <input id="f-nombre" type="search" list="lista-nombres" autocomplete="off" enterkeyhint="search" placeholder="Ej.: Ana García">
+                <button type="button" class="borrar" id="f-nombre-borrar" aria-label="Borrar nombre" hidden>×</button>
+              </div>
+              <button type="button" class="btn btn-primario" id="f-buscar">Buscar</button>
+            </div>
+            <datalist id="lista-nombres"></datalist>
+          </div>
+          <div class="filtro">
+            <label for="f-area">Área / Motivo</label>
+            <select id="f-area">
+              <option value="">Todas las áreas</option>
+            </select>
+          </div>
+          <div class="filtro">
+            <label for="f-orden">Ordenar por</label>
+            <select id="f-orden">
+              <option value="original">Orden de registro</option>
+              <option value="fecha-desc">Fecha: más reciente primero</option>
+              <option value="fecha-asc">Fecha: más antigua primero</option>
+              <option value="nombre-asc">Nombre: de A a Z</option>
+              <option value="nombre-desc">Nombre: de Z a A</option>
+            </select>
+          </div>
+          <div class="filtro filtro-limpiar">
+            <button type="button" class="btn" id="f-limpiar">Limpiar búsqueda y filtros</button>
+          </div>
+        </div>
+
+        <p class="estado-lista" id="f-estado" role="status" aria-live="polite"></p>
+
+        <table class="index-table tabla-resp tabla-registros" id="tabla-registros" role="table">
+          <caption class="sr-only">Registros ficticios de demostración</caption>
+          <thead>
+            <tr role="row">
+              <th scope="col" role="columnheader">Nombre</th>
+              <th scope="col" role="columnheader">Edad</th>
+              <th scope="col" role="columnheader">Sexo</th>
+              <th scope="col" role="columnheader">Fecha</th>
+              <th scope="col" role="columnheader">Área / Motivo</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-registros"></tbody>
+        </table>
+
+        <div class="sin-resultados" id="sin-resultados" role="status" hidden></div>
+      </div>
+    </div>
+
+    <!-- Historia clínica -->
+    <div class="doc">
+      <div class="doc-label">EXPEDIENTE N.° HC-04821 · ARCHIVO CLÍNICO</div>
+      <div class="doc-body">
+        <div class="doc-title">Historia Clínica</div>
+        <div class="doc-sub">Hospital Pedro Antonio Sexto</div>
+        <div class="field-grid">
+          <div class="field"><div class="fl">paciente</div><div class="fv">Marisol Estévez Peña</div></div>
+          <div class="field"><div class="fl">edad</div><div class="fv">34 años</div></div>
+          <div class="field"><div class="fl">fecha de ingreso</div><div class="fv">14/03/2026</div></div>
+          <div class="field"><div class="fl">servicio</div><div class="fv">Medicina Interna</div></div>
+          <div class="field"><div class="fl">médico tratante</div><div class="fv">Dr. Ramón Ovalle</div></div>
+          <div class="field"><div class="fl">diagnóstico</div><div class="fv">Neumonía adquirida en la comunidad</div></div>
+          <div class="field"><div class="fl">alergias</div><div class="fv">Ninguna conocida</div></div>
+          <div class="field"><div class="fl">estado</div><div class="fv">Activo</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Índice de archivo -->
+    <div class="doc">
+      <div class="doc-label">LIBRO ÍNDICE · ARCHIVO PASIVO Y ACTIVO</div>
+      <div class="doc-body">
+        <div class="doc-title">Índice de expedientes</div>
+        <div class="doc-sub">Fragmento del registro del departamento</div>
+        <table class="index-table tabla-resp" role="table">
+          <thead>
+            <tr role="row"><th scope="col" role="columnheader">N.° expediente</th><th scope="col" role="columnheader">Paciente</th><th scope="col" role="columnheader">Ingreso</th><th scope="col" role="columnheader">Estado</th></tr>
+          </thead>
+          <tbody>
+            <tr role="row"><td role="cell" data-label="N.° expediente">HC-04819</td><td role="cell" data-label="Paciente">Yolanda Reyes Cruz</td><td role="cell" data-label="Ingreso">02/03/2026</td><td role="cell" data-label="Estado"><span class="estado activo">activo</span></td></tr>
+            <tr role="row"><td role="cell" data-label="N.° expediente">HC-04820</td><td role="cell" data-label="Paciente">Elías Marte Nova</td><td role="cell" data-label="Ingreso">09/03/2026</td><td role="cell" data-label="Estado"><span class="estado activo">activo</span></td></tr>
+            <tr role="row"><td role="cell" data-label="N.° expediente">HC-04821</td><td role="cell" data-label="Paciente">Marisol Estévez Peña</td><td role="cell" data-label="Ingreso">14/03/2026</td><td role="cell" data-label="Estado"><span class="estado activo">activo</span></td></tr>
+            <tr role="row"><td role="cell" data-label="N.° expediente">HC-03102</td><td role="cell" data-label="Paciente">Bienvenido Ceballos</td><td role="cell" data-label="Ingreso">21/06/2015</td><td role="cell" data-label="Estado"><span class="estado pasivo">pasivo</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Consentimiento informado -->
+    <div class="doc">
+      <div class="doc-label">FORMULARIO F-07 · CONSENTIMIENTO INFORMADO</div>
+      <div class="doc-body">
+        <div class="doc-title">Consentimiento informado</div>
+        <div class="doc-sub">Para procedimiento médico o quirúrgico</div>
+        <div class="consent-text">
+          <p>Yo, <strong>Marisol Estévez Peña</strong>, portador(a) de la historia clínica N.° HC-04821, declaro que el Dr. Ramón Ovalle me ha explicado en qué consiste el procedimiento indicado, sus riesgos, beneficios y alternativas, y que autorizo su realización.</p>
+        </div>
+        <div class="sign-row">
+          <div class="sign-line">Firma del paciente</div>
+          <div class="sign-line">Firma del médico</div>
+        </div>
+        <div class="stamp">recibido — archivo</div>
+      </div>
+    </div>
+
+    <!-- Etiqueta de carpeta física -->
+    <div class="doc doc-etiqueta">
+      <div class="doc-body">
+        <div class="doc-title" style="margin-bottom:14px;">Etiqueta de carpeta física</div>
+        <div class="folder-tab"><div class="tabpart">HC-04821</div></div>
+        <div class="folder-body">
+          <div class="fnum">N.° HC-04821</div>
+          <div class="fname">Estévez Peña, Marisol</div>
+          <div class="frow"><span>Servicio</span><span>Medicina Interna</span></div>
+          <div class="frow"><span>Apertura</span><span>14/03/2026</span></div>
+          <div class="frow"><span>Ubicación</span><span>Estante 7, fila C</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="tipos" class="hidden" role="tabpanel" aria-labelledby="tab-tipos">
+  <div class="section-head">
+    <span class="num">03</span>
+    <h2>Tipos de archivos clínicos</h2>
+  </div>
+  <p class="lead">Un solo expediente reúne distintos documentos, generados por áreas diferentes del hospital.</p>
+
+  <div class="filecab">
+    <div class="drawer"><div class="label">Historia clínica</div><div class="desc">Documento principal: datos personales, antecedentes, diagnósticos y evolución del paciente.</div></div>
+    <div class="drawer"><div class="label">Notas de evolución</div><div class="desc">Registros diarios del médico o enfermería sobre el estado del paciente.</div></div>
+    <div class="drawer"><div class="label">Resultados de laboratorio</div><div class="desc">Análisis de sangre, orina, cultivos y demás pruebas realizadas.</div></div>
+    <div class="drawer"><div class="label">Estudios de imágenes</div><div class="desc">Radiografías, tomografías, resonancias y ecografías con su informe.</div></div>
+    <div class="drawer"><div class="label">Consentimiento informado</div><div class="desc">Documento firmado por el paciente que autoriza un procedimiento.</div></div>
+    <div class="drawer"><div class="label">Informe de alta</div><div class="desc">Resumen final de la hospitalización y recomendaciones.</div></div>
+  </div>
+</section>
+
+<section id="normativas" class="hidden" role="tabpanel" aria-labelledby="tab-normativas">
+  <div class="section-head">
+    <span class="num">04</span>
+    <h2>Normativas que rigen el archivo clínico</h2>
+  </div>
+  <p class="lead">El manejo del expediente está regulado por ley, porque contiene información sensible sobre la salud de una persona.</p>
+
+  <ul class="norms">
+    <li><div class="norm-title">Ley General de Salud</div><div class="norm-desc">Obliga a todo centro de salud a llevar un expediente clínico por paciente y define responsabilidades del personal frente a él.</div></li>
+    <li><div class="norm-title">Norma sobre la Historia Clínica</div><div class="norm-desc">Define el contenido mínimo, el orden y el formato que debe tener cada expediente.</div></li>
+    <li><div class="norm-title">Ley de Protección de Datos Personales</div><div class="norm-desc">Clasifica los datos de salud como información sensible y obliga a protegerlos frente a accesos no autorizados.</div></li>
+    <li><div class="norm-title">Secreto profesional</div><div class="norm-desc">Obliga a todo el que consulta un expediente a guardar confidencialidad, incluso tras dejar de atender al paciente.</div></li>
+    <li><div class="norm-title">Tiempo de conservación</div><div class="norm-desc">Exige conservar el expediente activo un mínimo de diez años tras la última atención, antes de pasar a archivo pasivo.</div></li>
+  </ul>
+
+  <div class="callout">
+    <strong>En resumen:</strong> el Departamento de Archivos no solo guarda papeles: sostiene la memoria clínica del paciente, respalda decisiones médicas futuras y protege un derecho legal a la privacidad.
+  </div>
+</section>
+
+</div>
+
+<footer>Departamento de Archivos — Hospital Pedro Antonio Sexto</footer>
+
+<script>
+/* =========================================================
+   REGISTROS FICTICIOS DE DEMOSTRACIÓN
+   Estas diez personas NO existen. No son pacientes reales.
+   No agregues aquí datos de personas reales: este archivo es
+   público cuando la página se publica.
+   Formato de fecha: AAAA-MM-DD (en pantalla se muestra DD/MM/AAAA).
+   ========================================================= */
+window.REGISTROS_DEMO = [
+  { nombre: 'Juan Pérez',       edad: 35, sexo: 'Masculino', fecha: '2026-10-28', area: 'Emergencia' },
+  { nombre: 'María Rodríguez',  edad: 42, sexo: 'Femenino',  fecha: '2026-10-28', area: 'Medicina general' },
+  { nombre: 'Pedro Martínez',   edad: 28, sexo: 'Masculino', fecha: '2026-10-28', area: 'Cirugía' },
+  { nombre: 'Ana García',       edad: 19, sexo: 'Femenino',  fecha: '2026-10-28', area: 'Pediatría' },
+  { nombre: 'Luis Hernández',   edad: 56, sexo: 'Masculino', fecha: '2026-10-28', area: 'Emergencia' },
+  { nombre: 'Carmen López',     edad: 31, sexo: 'Femenino',  fecha: '2026-10-28', area: 'Maternidad' },
+  { nombre: 'José Ramírez',     edad: 47, sexo: 'Masculino', fecha: '2026-10-28', area: 'Medicina general' },
+  { nombre: 'Rosa Castillo',    edad: 24, sexo: 'Femenino',  fecha: '2026-10-28', area: 'Cirugía' },
+  { nombre: 'Miguel Santos',    edad: 63, sexo: 'Masculino', fecha: '2026-10-28', area: 'Emergencia' },
+  { nombre: 'Laura Díaz',       edad: 38, sexo: 'Femenino',  fecha: '2026-10-28', area: 'Medicina general' }
+];
+
+</script>
+<script>
+/* =========================================================
+   Departamento de Archivos — comportamiento de la página
+   Todo se ejecuta en el navegador. No se guarda ni se envía
+   ningún dato (no hay localStorage, cookies ni peticiones).
+   ========================================================= */
+(function () {
+  'use strict';
+
+  var REGISTROS = Array.isArray(window.REGISTROS_DEMO) ? window.REGISTROS_DEMO : [];
+  var MIN_LETRAS = 2;
+  var MAX_RESULTADOS = 20;
+  var ORDEN_INICIAL = 'original';
+  var collator = new Intl.Collator('es', { sensitivity: 'base' });
+
+  function $(sel, ctx) { return (ctx || document).querySelector(sel); }
+  function $$(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
+  function suave() {
+    return (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth';
+  }
+
+  /* ---------- Utilidades de texto ---------- */
+
+  // Minúsculas y sin tildes, conservando la longitud (así se pueden resaltar coincidencias).
+  function plegar(texto) {
+    var s = String(texto == null ? '' : texto);
+    var salida = '';
+    for (var i = 0; i < s.length; i++) {
+      var original = s.charAt(i);
+      var min = original.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      if (min.length !== 1) {
+        min = original.toLowerCase();
+        if (min.length !== 1) { min = original; }
+      }
+      salida += min;
+    }
+    return salida;
+  }
+  function tokensDe(q) {
+    return plegar(String(q || '').normalize('NFC')).split(/\s+/).filter(Boolean);
+  }
+  function colapsar(t) { return String(t || '').replace(/\s+/g, ' ').trim(); }
+  function fechaLegible(iso) {
+    var p = String(iso).split('-');
+    return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : String(iso);
+  }
+  function textoEdad(n) { return n + (n === 1 ? ' año' : ' años'); }
+
+  // Escribe "texto" dentro de "destino" resaltando con <mark> las coincidencias (sin usar innerHTML).
+  function resaltar(destino, texto, tokens) {
+    var p = plegar(texto);
+    var rangos = [];
+    tokens.forEach(function (t) {
+      var i = p.indexOf(t);
+      while (i !== -1) { rangos.push([i, i + t.length]); i = p.indexOf(t, i + t.length); }
+    });
+    rangos.sort(function (a, b) { return a[0] - b[0]; });
+    var fusion = [];
+    rangos.forEach(function (r) {
+      var u = fusion[fusion.length - 1];
+      if (u && r[0] <= u[1]) { u[1] = Math.max(u[1], r[1]); } else { fusion.push([r[0], r[1]]); }
+    });
+    var pos = 0;
+    fusion.forEach(function (r) {
+      if (r[0] > pos) { destino.appendChild(document.createTextNode(texto.slice(pos, r[0]))); }
+      var m = document.createElement('mark');
+      m.textContent = texto.slice(r[0], r[1]);
+      destino.appendChild(m);
+      pos = r[1];
+    });
+    if (pos < texto.length) { destino.appendChild(document.createTextNode(texto.slice(pos))); }
+  }
+
+  function destacar(el) {
+    if (!el) { return; }
+    el.classList.add('encontrado');
+    if (!el.hasAttribute('tabindex')) { el.setAttribute('tabindex', '-1'); }
+    try { el.focus({ preventScroll: true }); } catch (e) { /* sin foco */ }
+    el.scrollIntoView({ block: 'center', behavior: suave() });
+    setTimeout(function () { el.classList.remove('encontrado'); }, 2800);
+  }
+
+  /* ---------- Pestañas ---------- */
+
+  var tabs = $$('.tab');
+  var secciones = $$('section[id]');
+  var hero = { kicker: $('#hero-kicker'), titulo: $('#hero-title'), texto: $('#hero-text') };
+
+  function tabDe(id) {
+    return tabs.filter(function (t) { return t.getAttribute('data-target') === id; })[0] || null;
+  }
+
+  function activarTab(id, opciones) {
+    var o = opciones || {};
+    var tab = tabDe(id);
+    if (!tab) { return false; }
+    tabs.forEach(function (t) {
+      var activa = t === tab;
+      t.classList.toggle('active', activa);
+      t.setAttribute('aria-selected', activa ? 'true' : 'false');
+      t.setAttribute('tabindex', activa ? '0' : '-1');
+    });
+    secciones.forEach(function (s) { s.classList.toggle('hidden', s.id !== id); });
+    hero.kicker.textContent = tab.getAttribute('data-kicker');
+    hero.titulo.textContent = tab.getAttribute('data-title');
+    hero.texto.textContent = tab.getAttribute('data-text');
+    if (o.hash !== false) {
+      try { history.replaceState(null, '', '#' + id); } catch (e) { /* algunos entornos no lo permiten */ }
+    }
+    if (o.scrollArriba) { window.scrollTo({ top: 0, behavior: suave() }); }
+    return true;
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () {
+      activarTab(tab.getAttribute('data-target'), { scrollArriba: true });
+    });
+    tab.addEventListener('keydown', function (ev) {
+      var destino = -1;
+      if (ev.key === 'ArrowRight' || ev.key === 'ArrowDown') { destino = (i + 1) % tabs.length; }
+      else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp') { destino = (i - 1 + tabs.length) % tabs.length; }
+      else if (ev.key === 'Home') { destino = 0; }
+      else if (ev.key === 'End') { destino = tabs.length - 1; }
+      if (destino === -1) { return; }
+      ev.preventDefault();
+      activarTab(tabs[destino].getAttribute('data-target'), {});
+      tabs[destino].focus();
+    });
+  });
+
+  window.addEventListener('hashchange', function () {
+    var id = (location.hash || '').slice(1);
+    if (tabDe(id)) { activarTab(id, { hash: false, scrollArriba: true }); }
+  });
+
+  /* ---------- Consulta de registros ---------- */
+
+  var inpNombre = $('#f-nombre');
+  var btnNombreBorrar = $('#f-nombre-borrar');
+  var btnBuscar = $('#f-buscar');
+  var selArea = $('#f-area');
+  var selOrden = $('#f-orden');
+  var btnLimpiar = $('#f-limpiar');
+  var estadoLista = $('#f-estado');
+  var tabla = $('#tabla-registros');
+  var tbody = $('#tbody-registros');
+  var sinResultados = $('#sin-resultados');
+  var listaNombres = $('#lista-nombres');
+
+  function llenarOpciones() {
+    var areas = [];
+    REGISTROS.forEach(function (r) { if (areas.indexOf(r.area) === -1) { areas.push(r.area); } });
+    areas.sort(function (a, b) { return collator.compare(a, b); });
+    areas.forEach(function (a) {
+      var op = document.createElement('option');
+      op.value = a; op.textContent = a;
+      selArea.appendChild(op);
+    });
+    REGISTROS.map(function (r) { return r.nombre; })
+      .sort(function (a, b) { return collator.compare(a, b); })
+      .forEach(function (n) {
+        var op = document.createElement('option');
+        op.value = n;
+        listaNombres.appendChild(op);
+      });
+  }
+
+  function ordenar(lista, modo) {
+    function porNombre(a, b) { return collator.compare(a.r.nombre, b.r.nombre) || a.i - b.i; }
+    function porFecha(a, b) { return a.r.fecha < b.r.fecha ? -1 : (a.r.fecha > b.r.fecha ? 1 : 0); }
+    if (modo === 'nombre-asc') { lista.sort(porNombre); }
+    else if (modo === 'nombre-desc') { lista.sort(function (a, b) { return porNombre(b, a); }); }
+    else if (modo === 'fecha-asc') { lista.sort(function (a, b) { return porFecha(a, b) || porNombre(a, b); }); }
+    else if (modo === 'fecha-desc') { lista.sort(function (a, b) { return porFecha(b, a) || porNombre(a, b); }); }
+    else { lista.sort(function (a, b) { return a.i - b.i; }); }
+    return lista;
+  }
+
+  function registrosFiltrados() {
+    var tokens = tokensDe(inpNombre.value);
+    var area = selArea.value;
+    var lista = [];
+    REGISTROS.forEach(function (r, i) {
+      if (area && r.area !== area) { return; }
+      var nombre = plegar(r.nombre);
+      var ok = tokens.every(function (t) { return nombre.indexOf(t) !== -1; });
+      if (ok) { lista.push({ r: r, i: i }); }
+    });
+    return ordenar(lista, selOrden.value);
+  }
+
+  function crearCelda(etiqueta, texto) {
+    var td = document.createElement('td');
+    td.setAttribute('role', 'cell');
+    td.setAttribute('data-label', etiqueta);
+    td.textContent = texto;
+    return td;
+  }
+  function crearFila(r, i) {
+    var tr = document.createElement('tr');
+    tr.setAttribute('role', 'row');
+    tr.setAttribute('data-indice', String(i));
+    tr.appendChild(crearCelda('Nombre', r.nombre));
+    tr.appendChild(crearCelda('Edad', textoEdad(r.edad)));
+    tr.appendChild(crearCelda('Sexo', r.sexo));
+    tr.appendChild(crearCelda('Fecha', fechaLegible(r.fecha)));
+    tr.appendChild(crearCelda('Área / Motivo', r.area));
+    return tr;
+  }
+
+  function hayFiltros() {
+    return colapsar(inpNombre.value) !== '' || selArea.value !== '' || selOrden.value !== ORDEN_INICIAL;
+  }
+
+  function mostrarSinResultados() {
+    var nombre = colapsar(inpNombre.value);
+    var area = selArea.value;
+    var detalle;
+    if (nombre && area) { detalle = 'No hay registros con el nombre «' + nombre + '» en el área «' + area + '».'; }
+    else if (nombre) { detalle = 'Ningún nombre contiene «' + nombre + '».'; }
+    else { detalle = 'No hay registros en el área «' + area + '».'; }
+
+    sinResultados.textContent = '';
+    var t = document.createElement('p'); t.className = 'sin-titulo'; t.textContent = 'No se encontraron registros';
+    var d = document.createElement('p'); d.textContent = detalle;
+    var c = document.createElement('p'); c.textContent = 'Revisa la ortografía (las tildes no importan) o limpia la búsqueda para volver a ver los ' + REGISTROS.length + ' registros.';
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'btn'; b.textContent = 'Ver todos los registros';
+    b.addEventListener('click', limpiarRegistros);
+    sinResultados.appendChild(t); sinResultados.appendChild(d); sinResultados.appendChild(c); sinResultados.appendChild(b);
+  }
+
+  function renderRegistros() {
+    btnNombreBorrar.hidden = inpNombre.value === '';
+    if (!REGISTROS.length) {
+      tabla.hidden = true;
+      sinResultados.hidden = false;
+      sinResultados.textContent = 'No se pudieron cargar los registros de demostración (archivo js/datos.js).';
+      estadoLista.textContent = '';
+      return;
+    }
+    var lista = registrosFiltrados();
+    tbody.textContent = '';
+    lista.forEach(function (x) { tbody.appendChild(crearFila(x.r, x.i)); });
+
+    var hay = lista.length > 0;
+    tabla.hidden = !hay;
+    sinResultados.hidden = hay;
+    if (!hay) { mostrarSinResultados(); }
+
+    var total = REGISTROS.length;
+    var msg;
+    if (!hay) { msg = 'Mostrando 0 de ' + total + ' registros ficticios.'; }
+    else if (lista.length === total) { msg = 'Mostrando los ' + total + ' registros ficticios.'; }
+    else { msg = 'Mostrando ' + lista.length + ' de ' + total + ' registros ficticios.'; }
+
+    if (hay && lista.length > 1 && selOrden.value.indexOf('fecha') === 0) {
+      var f0 = lista[0].r.fecha;
+      var iguales = lista.every(function (x) { return x.r.fecha === f0; });
+      if (iguales) { msg += ' Todos tienen la misma fecha, por eso se ordenan por nombre.'; }
+    }
+    estadoLista.textContent = msg;
+  }
+
+  function limpiarRegistros() {
+    inpNombre.value = '';
+    selArea.value = '';
+    selOrden.value = ORDEN_INICIAL;
+    renderRegistros();
+  }
+
+  function irAResultados() {
+    inpNombre.blur();
+    renderRegistros();
+    estadoLista.scrollIntoView({ block: 'start', behavior: suave() });
+  }
+
+  inpNombre.addEventListener('input', renderRegistros);
+  inpNombre.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); irAResultados(); } });
+  selArea.addEventListener('change', renderRegistros);
+  selOrden.addEventListener('change', renderRegistros);
+  btnBuscar.addEventListener('click', irAResultados);
+  btnLimpiar.addEventListener('click', limpiarRegistros);
+  btnNombreBorrar.addEventListener('click', function () { inpNombre.value = ''; renderRegistros(); inpNombre.focus(); });
+
+  /* ---------- Buscador general ---------- */
+
+  var formGlobal = $('#form-global');
+  var inpGlobal = $('#q-global');
+  var btnGlobalBorrar = $('#q-global-borrar');
+  var panel = $('#resultados');
+  var listaRes = $('#resultados-lista');
+  var estadoRes = $('#resultados-estado');
+  var btnCerrar = $('#resultados-cerrar');
+  var indice = [];
+  var ultimos = [];
+
+  function txt(el) { return el ? colapsar(el.textContent) : ''; }
+  function nombreTab(id) { var t = tabDe(id); return t ? colapsar(t.textContent) : id; }
+
+  function construirIndice() {
+    var unidades = [
+      { sel: '.lead', titulo: function (el) { return txt(el.closest('section').querySelector('h2')); } },
+      { sel: '.nota-ficticia', titulo: function () { return 'Datos ficticios'; } },
+      { sel: '.card', titulo: function (el) { return txt(el.querySelector('h3')); } },
+      { sel: '.drawer', titulo: function (el) { return txt(el.querySelector('.label')); } },
+      { sel: '.norms li', titulo: function (el) { return txt(el.querySelector('.norm-title')); } },
+      { sel: '.callout', titulo: function () { return 'En resumen'; } },
+      { sel: '.doc:not(#consulta-registros)', titulo: function (el) { return txt(el.querySelector('.doc-title')); } }
+    ];
+    unidades.forEach(function (u) {
+      $$(u.sel).forEach(function (el) {
+        var seccion = el.closest('section');
+        if (!seccion) { return; }
+        var titulo = u.titulo(el);
+        var cuerpo = txt(el);
+        if (titulo && cuerpo.indexOf(titulo) === 0) { cuerpo = colapsar(cuerpo.slice(titulo.length)); }
+        indice.push({
+          tipo: 'seccion', seccionId: seccion.id, seccion: nombreTab(seccion.id),
+          titulo: titulo, cuerpo: cuerpo, el: el,
+          plano: plegar(titulo + ' ' + cuerpo)
+        });
+      });
+    });
+    REGISTROS.forEach(function (r, i) {
+      var cuerpo = textoEdad(r.edad) + ' · ' + r.sexo + ' · ' + fechaLegible(r.fecha) + ' · ' + r.area + ' · registro ficticio de demostración';
+      indice.push({
+        tipo: 'registro', seccionId: 'ejemplos', seccion: nombreTab('ejemplos') + ' · consulta de registros',
+        titulo: r.nombre, cuerpo: cuerpo, indice: i,
+        plano: plegar(r.nombre + ' ' + cuerpo)
+      });
+    });
+  }
+
+  function extracto(cuerpo, tokens) {
+    var p = plegar(cuerpo);
+    var pos = -1;
+    tokens.forEach(function (t) {
+      var i = p.indexOf(t);
+      if (i !== -1 && (pos === -1 || i < pos)) { pos = i; }
+    });
+    var ini = pos === -1 ? 0 : Math.max(0, pos - 45);
+    if (ini > 0) { var sp = cuerpo.indexOf(' ', ini); if (sp !== -1 && sp < pos) { ini = sp + 1; } }
+    var fin = Math.min(cuerpo.length, ini + 150);
+    if (fin < cuerpo.length) { var sp2 = cuerpo.lastIndexOf(' ', fin); if (sp2 > ini + 60) { fin = sp2; } }
+    return (ini > 0 ? '… ' : '') + cuerpo.slice(ini, fin) + (fin < cuerpo.length ? ' …' : '');
+  }
+
+  function cerrarResultados() { panel.hidden = true; listaRes.textContent = ''; estadoRes.textContent = ''; ultimos = []; }
+
+  function buscarGlobal(desdeEnvio) {
+    var q = colapsar(inpGlobal.value);
+    btnGlobalBorrar.hidden = inpGlobal.value === '';
+    if (q === '') { cerrarResultados(); return; }
+    if (q.length < MIN_LETRAS) {
+      if (desdeEnvio) {
+        listaRes.textContent = '';
+        estadoRes.textContent = 'Escribe al menos ' + MIN_LETRAS + ' letras para buscar.';
+        panel.hidden = false;
+      } else { cerrarResultados(); }
+      return;
+    }
+    var tokens = tokensDe(q);
+    var hallados = indice.filter(function (e) { return tokens.every(function (t) { return e.plano.indexOf(t) !== -1; }); });
+    ultimos = hallados.slice(0, MAX_RESULTADOS);
+    listaRes.textContent = '';
+
+    if (!hallados.length) {
+      estadoRes.textContent = 'Sin resultados para «' + q + '». Prueba con otra palabra; las tildes no importan.';
+    } else {
+      var n = hallados.length;
+      estadoRes.textContent = (n === 1 ? '1 resultado' : n + ' resultados') + ' para «' + q + '»' +
+        (n > MAX_RESULTADOS ? '. Se muestran los primeros ' + MAX_RESULTADOS + '; escribe más letras para afinar.' : '.');
+      ultimos.forEach(function (e, i) {
+        var li = document.createElement('li');
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'resultado'; b.setAttribute('data-i', String(i));
+        var s = document.createElement('span'); s.className = 'res-seccion'; s.textContent = e.seccion;
+        var t = document.createElement('span'); t.className = 'res-titulo'; resaltar(t, e.titulo, tokens);
+        var x = document.createElement('span'); x.className = 'res-extracto'; resaltar(x, extracto(e.cuerpo, tokens), tokens);
+        b.appendChild(s); b.appendChild(t); b.appendChild(x);
+        li.appendChild(b); listaRes.appendChild(li);
+      });
+    }
+    panel.hidden = false;
+  }
+
+  function limpiarGlobal() {
+    inpGlobal.value = '';
+    btnGlobalBorrar.hidden = true;
+    cerrarResultados();
+  }
+
+  function irAResultado(e) {
+    limpiarGlobal();
+    if (e.tipo === 'registro') {
+      var r = REGISTROS[e.indice];
+      inpNombre.value = r.nombre;
+      selArea.value = '';
+      selOrden.value = ORDEN_INICIAL;
+      activarTab('ejemplos', {});
+      renderRegistros();
+      destacar(tbody.querySelector('tr[data-indice="' + e.indice + '"]'));
+    } else {
+      activarTab(e.seccionId, {});
+      destacar(e.el);
+    }
+  }
+
+  formGlobal.addEventListener('submit', function (ev) { ev.preventDefault(); buscarGlobal(true); });
+  inpGlobal.addEventListener('input', function () { buscarGlobal(false); });
+  inpGlobal.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { limpiarGlobal(); } });
+  btnGlobalBorrar.addEventListener('click', function () { limpiarGlobal(); inpGlobal.focus(); });
+  btnCerrar.addEventListener('click', function () { limpiarGlobal(); inpGlobal.focus(); });
+  listaRes.addEventListener('click', function (ev) {
+    var b = ev.target.closest('.resultado');
+    if (!b) { return; }
+    var e = ultimos[Number(b.getAttribute('data-i'))];
+    if (e) { irAResultado(e); }
+  });
+
+  /* ---------- Inicio ---------- */
+
+  llenarOpciones();
+  renderRegistros();
+  construirIndice();
+  var inicial = (location.hash || '').slice(1);
+  activarTab(tabDe(inicial) ? inicial : tabs[0].getAttribute('data-target'), { hash: false });
+})();
+
+</script>
+
+</body>
+</html>
